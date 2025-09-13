@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Diabetes Prediction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: background 0.8s ease; /* smooth background change */
+        }
+
+        /* Background when diabetic - solid red */
+        body.diabetic {
+            background: #ff0000;
+        }
+
+        /* Background when non-diabetic - solid green */
+        body.non-diabetic {
+            background: #00cc44;
+        }
+
+        h2 {
+            color: white;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #fff, #e8f4fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        form {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            width: 400px;
+            max-width: 90vw;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15), 
+                        0 0 0 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        form:hover {
+            transform: translateY(-5px);
+        }
+
+        input {
+            width: 100%;
+            margin: 15px 0;
+            padding: 15px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 16px;
+            background: #fff;
+            transition: all 0.3s ease;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1),
+                        0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        h3 {
+            color: white;
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90vw;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            h2 { font-size: 2em; margin-bottom: 20px; }
+            form { padding: 30px 25px; width: 95vw; }
+            input { padding: 12px 15px; margin: 12px 0; }
+            button { padding: 15px; font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <h2>Diabetes Prediction Form</h2>
+    <form action="/predict" method="post">
+        <input type="number" name="Pregnancies" placeholder="Pregnancies" required>
+        <input type="number" name="Glucose" placeholder="Glucose" required>
+        <input type="number" name="BloodPressure" placeholder="Blood Pressure" required>
+        <input type="number" name="SkinThickness" placeholder="Skin Thickness" required>
+        <input type="number" name="Insulin" placeholder="Insulin" required>
+        <input type="text" name="BMI" placeholder="BMI" required>
+        <input type="text" name="DiabetesPedigreeFunction" placeholder="Diabetes Pedigree Function" required>
+        <input type="number" name="Age" placeholder="Age" required>
+        <button type="submit">Predict</button>
+    </form>
+    <h3>{{ prediction_text }}</h3>
+
+    <script>
+        function updateBackgroundBasedOnPrediction() {
+            const predictionElement = document.querySelector('h3');
+            if (!predictionElement) return;
+
+            const predictionText = predictionElement.textContent.toLowerCase().trim();
+
+            if (predictionText.includes('diabetic') && 
+                !predictionText.includes('not') && 
+                !predictionText.includes('no')) {
+                document.body.className = 'diabetic';
+            } else if (predictionText.includes('not diabetic') || 
+                       predictionText.includes('no diabetes') || 
+                       predictionText.includes('non-diabetic') ||
+                       predictionText.includes('not have diabetes')) {
+                document.body.className = 'non-diabetic';
+            } else {
+                document.body.className = '';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', updateBackgroundBasedOnPrediction);
+        setInterval(updateBackgroundBasedOnPrediction, 500);
+    </script>
+</body>
+</html>

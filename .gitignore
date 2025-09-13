@@ -1,0 +1,14 @@
+# Python
+*.pyc
+__pycache__/
+*.pkl
+
+# VSCode
+.vscode/
+
+# Environment
+env/
+diabetes_env/
+
+# Others
+.DS_Store
